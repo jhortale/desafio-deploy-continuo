@@ -11,35 +11,33 @@ steps:
 
   - id: "Montando Imagem Docker"
     name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/desafio-go-hpa:latest", "."]
-    - id: "Building image from dockerfile.prod"
-      name: "gcr.io/cloud-builders/docker"
-      args:
-          [
-              "build",
-              "-t",
-              "gcr.io/$PROJECT_ID/desafio-deploy-continuo:$SHORT_SHA",
-              ".",
-          ]
-    - id: "Pushing Image"
-      name: "gcr.io/cloud-builders/docker"
-      args: ["push", "gcr.io/$PROJECT_ID/desafio-deploy-continuo:$SHORT_SHA"]
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/$PROJECT_ID/desafio-deploy-continuo:$SHORT_SHA",
+        ".",
+      ]
 
-    - id: "Adjusting deployment file - k8s"
-      name: "gcr.io/cloud-builders/gcloud"
-      entrypoint: "/bin/sh"
-      args:
-          - "-c"
-          - |
-              sed "s#img-app-deployment#gcr.io/$PROJECT_ID/desafio-deploy-continuo:$SHORT_SHA#g" k8s/app/deployment.yaml > k8s/app/deployment-new.yaml;
-              cat k8s/app/deployment-new.yaml
+  - id: "Pushing Image"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/desafio-deploy-continuo:$SHORT_SHA"]
 
-    - id: "Deploying k8s"
-      name: "gcr.io/cloud-builders/kubectl"
-      args:
-          - "apply"
-          - "-f"
-          - "k8s/app/deployment-new.yaml"
-      env:
-          - "CLOUDSDK_COMPUTE_ZONE=us-central1-c"
-          - "CLOUDSDK_CONTAINER_CLUSTER=code-education-cluster"
+  - id: "Adjusting deployment file - k8s"
+    name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "/bin/sh"
+    args:
+      - "-c"
+      - |
+        sed "s#img-app-deployment#gcr.io/$PROJECT_ID/desafio-deploy-continuo:$SHORT_SHA#g" k8s/app/deployment.yaml > k8s/app/deployment-new.yaml;
+        cat k8s/app/deployment-new.yaml
+
+  - id: "Deploying k8s"
+    name: "gcr.io/cloud-builders/kubectl"
+    args:
+      - "apply"
+      - "-f"
+      - "k8s/app/deployment-new.yaml"
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=us-central1-c"
+      - "CLOUDSDK_CONTAINER_CLUSTER=code-education-cluster"
