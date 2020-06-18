@@ -1,9 +1,12 @@
-# Docker Image
+# CI for all branches except Master
+cloudbuild.yaml
 
-https://hub.docker.com/repository/docker/jhortale/go-hpa
-
-# RUN
-
+Insert on GCP the following regex for exclude master branch from CI
+```bash
+^(([^m]|m($|[^a]|a($|[^s]|s($|[^t]|t($|[^e]|e($|[^r]))))))|master.+)
 ```
-docker run --name webapp -p 80:80 jhortale/go-hpa
-```
+
+
+# CI+CD only for master branch
+cloudbuild.prod.yaml
+
