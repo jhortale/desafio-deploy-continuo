@@ -11,7 +11,7 @@ func sqrt() string {
 	for i := 0; i < 10; i++ {
 		x += math.Sqrt(x)
 	}
-	return "Code.education always Rocks!"
+	return "Code.education Rocks!"
 }
 
 func HttpServer(w http.ResponseWriter, r *http.Request) {
